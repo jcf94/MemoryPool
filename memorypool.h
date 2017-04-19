@@ -6,46 +6,55 @@ PROG	: Memory Pool Head File
 
 #include <cstdlib>
 #include <unordered_map>
+#include <iostream>
+
+#define OUTC(data) std::cout << data << std::endl
 
 namespace MemoryPoolNamespace{
 
+class MemoryPool;
+
+typedef struct Block_Struct Block;
+Block* CreateBlock(MemoryPool* mempool, void* memblock, int size,
+                    Block* next = NULL, Block* prev = NULL,
+                    Block* Nextfreeblock = NULL);
+
+struct Block_Struct
+{
+    void* _blockaddr;
+    int _blocksize;
+    MemoryPool* _mempool;
+    bool _inuse;
+    Block* Next;
+    Block* Prev;
+    Block* Nextfreeblock;
+};
+#define BLOCK_OFFSET sizeof(Block)
+
 class MemoryPool
 {
-    friend class Block;
     public:
         MemoryPool(int size)
         {
-            _mainsize = size;
-            _mainblock = malloc(_mainsize);
-            now = 0;
+            _memblock = malloc(size+BLOCK_OFFSET);
+            _freeblock = CreateBlock(this, _memblock, size);
         }
         ~MemoryPool()
         {
-            free(_mainblock);
+            free(_memblock);
         }
-        int gettotalsize();
-        void* mpmalloc(int size);
-        int used();
         void* mbmalloc(int size);
-    //private:
-        void* _mainblock;
-        int _mainsize;
-        int now;
+        void mbfree(void* memaddr);
+        void freeblocktravel();
+        void blocktravel();
+    private:
+        void* _memblock;
+        Block* _freeblock;
+        void mbmerge(Block* block);
+
         typedef std::unordered_map<int, void*> id_pointer_map;
         
         typedef std::unordered_map<void*, int> pointer_id_map;
-};
-
-class Block
-{
-    public:
-        Block(MemoryPool* mempool, void* addr, int size): 
-            _mempool(mempool), _blockaddr(addr), _blocksize(size){}
-    private:
-        void* _blockaddr;
-        int _blocksize;
-        MemoryPool* _mempool;
-        int _blockid;
 };
 
 }

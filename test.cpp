@@ -13,31 +13,42 @@ PROG	: Memory Pool Test File
 using namespace std;
 using namespace MemoryPoolNamespace;
 
-#define OUTC(data) cout << data << endl
-
 int main()
 {
-    MemoryPool mem = MemoryPool(100);
-    OUTC(mem.gettotalsize());
-    OUTC(mem._mainblock);
-    
-    int* a = (int*)mem.mpmalloc(sizeof(int));
-    *a = 12;
-    OUTC(mem.used());
-    OUTC(a);
-    OUTC(*a);
-
-    float* b = (float*)mem.mpmalloc(sizeof(float));
-    OUTC(mem.used());
-    OUTC(b);
-    OUTC(*b);
-
-    double *c = (double*)mem.mbmalloc(sizeof(double));
-    OUTC(mem.used());
-    OUTC(c);
-    OUTC(*c);
+    MemoryPool mem = MemoryPool(1000);
+    mem.blocktravel();
 
     OUTC(sizeof(void*));
+    OUTC(sizeof(int));
+    OUTC(sizeof(MemoryPool*));
+    OUTC(sizeof(Block*));
+    OUTC(BLOCK_OFFSET);
+
+    int* a = (int*) mem.mbmalloc(sizeof(int));
+    mem.blocktravel();
+    *a = 12345;
+    OUTC(*a);
+
+    float* b = (float*) mem.mbmalloc(sizeof(float));
+    mem.blocktravel();
+
+    double* c = (double*) mem.mbmalloc(sizeof(double));
+    mem.blocktravel();
+
+    mem.mbfree(a);
+    mem.blocktravel();
+    mem.mbfree(b);
+    mem.blocktravel();
+
+    a = (int*) mem.mbmalloc(sizeof(int));
+    mem.blocktravel();
+    OUTC(*a);
+
+    mem.mbfree(c);
+    mem.blocktravel();
+
+    mem.mbfree(a);
+    mem.blocktravel();
 
     return 0;
 }
