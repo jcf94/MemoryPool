@@ -5,6 +5,9 @@ PROG	: Memory Pool Function File
 ************************************************ */
 
 #include "memorypool.h"
+#include <iostream>
+
+#define OUTC(data) std::cout << data << std::endl
 
 namespace MemoryPoolNamespace{
 
@@ -20,7 +23,7 @@ void* MemoryPool::mbmalloc(int size)
         {
             // Cut the original freeblock
             // Create New freeblock header
-            Block* temp = CreateBlock(source->_mempool, source->_blockaddr+size, source->_blocksize-size-BLOCK_OFFSET, source->Next, source);
+            Block* temp = CreateBlock(source->_blockaddr+size, source->_blocksize-size-BLOCK_OFFSET, source->Next, source);
             // Change _freeblock
             temp->Nextfreeblock = source->Nextfreeblock;
             if (source->Next)
@@ -133,13 +136,12 @@ void MemoryPool::blocktravel()
     }
 }
 
-Block* CreateBlock(MemoryPool* mempool, void* memblock, int size,
-                    Block* next, Block* prev, Block* Nextfreeblock)
+Block* CreateBlock(void* memblock, int size, Block* next,
+                    Block* prev, Block* Nextfreeblock)
 {
     Block* temp = (Block*)memblock;
     temp->_blockaddr = (void*)temp+BLOCK_OFFSET;
     temp->_blocksize = size;
-    temp->_mempool = mempool;
     temp->_inuse = false;
     temp->Next = next;
     temp->Prev = prev;

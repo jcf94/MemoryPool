@@ -10,6 +10,8 @@ PROG	: Memory Pool Test File
 #include <algorithm>
 #include "memorypool.h"
 
+#define OUTC(data) std::cout << data << std::endl
+
 using namespace std;
 using namespace MemoryPoolNamespace;
 
