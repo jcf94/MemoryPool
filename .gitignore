@@ -1,2 +1,7 @@
 *.o
 *.out
+Makefile.win
+*.dev
+*.exe
+*.layout
+.vscode/*
