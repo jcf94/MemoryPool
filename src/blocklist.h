@@ -18,12 +18,14 @@ enum BlockStatus
     IDLE
 };
 
+class BlockList;
+
 class MemBlock
 {
     friend class BlockList;
 
 public:
-    MemBlock(int size = 0);
+    MemBlock(BlockList* blocklist = NULL, int size = 0);
     ~MemBlock();
 
     inline void* block() const {return block_;}
@@ -39,18 +41,25 @@ private:
     void* block_;
     int size_;
     BlockStatus status_;
+
+    BlockList* blocklist_;
 };
 
 class BlockList
 {
 public:
-    BlockList(int size);
+    BlockList(int blocksize);
     ~BlockList();
+
+    inline int blocksize() const {return blocksize_;}
+    inline int total() const {return blockbackup_.size();}
 
     MemBlock* malloc();
 
     // For Debug
     void travel();
+
+    int inuse;
 
 private:
     MemBlock* new_block();
@@ -59,7 +68,7 @@ private:
     MemBlock* listtail_;
     std::vector<MemBlock*> blockbackup_;
 
-    int size_;
+    int blocksize_;
 };
 
 #endif // !BLOCKLIST_H

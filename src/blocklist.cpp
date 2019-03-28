@@ -9,15 +9,16 @@ PROG   : BLOCKLIST_CPP
 
 #include "blocklist.h"
 
-MemBlock::MemBlock(int size)
-    : size_(size), prev_(NULL), next_(NULL), status_(IDLE)
+MemBlock::MemBlock(BlockList* blocklist, int size)
+    : blocklist_(blocklist), size_(size),
+    prev_(NULL), next_(NULL), status_(IDLE)
 {
     if (size > 0) block_ = malloc(size);
 }
 
 MemBlock::~MemBlock()
 {
-    ::free(block_);
+    if (size_ > 0) ::free(block_);
 }
 
 void MemBlock::free()
@@ -29,38 +30,37 @@ void MemBlock::free()
     } else
     {
         status_ = IDLE;
+        --blocklist_->inuse;
 
         prev_->next_ = this;
         if (next_) next_->prev_ = this;
     }
 }
 
-BlockList::BlockList(int size)
-    : size_(size)
+BlockList::BlockList(int blocksize)
+    : blocksize_(blocksize), inuse(0)
 {
-    if (size <= 0)
+    if (blocksize_ <= 0)
     {
         std::cout << "Error: size must be a positive integer in BlockList\n";
         return ;
     }
-    listhead_ = new MemBlock();
+    listhead_ = new MemBlock(this);
     listtail_ = listhead_;
 }
 
 BlockList::~BlockList()
 {
-    MemBlock* temp = listhead_;
-    while (temp->next_)
+    for (auto i:blockbackup_)
     {
-        temp = temp->next_;
-        delete(temp->prev_);
+        delete i;
     }
-    delete(temp);
+    delete listhead_;
 }
 
 MemBlock* BlockList::new_block()
 {
-    MemBlock* temp = new MemBlock(size_);
+    MemBlock* temp = new MemBlock(this, blocksize_);
     blockbackup_.push_back(temp);
 
     listhead_->next_ = temp;
@@ -80,6 +80,8 @@ MemBlock* BlockList::malloc()
     if (!target) target = new_block();
 
     target->status_ = INUSE;
+    ++inuse;
+
     target->prev_->next_ = target->next_;
     if (target->next_) target->next_->prev_ = target->prev_;
 

@@ -1,7 +1,7 @@
 /* ***********************************************
 MYID   : Chen Fan
 LANG   : G++
-PROG   : 
+PROG   : MAIN
 ************************************************ */
 
 #include <iostream>
@@ -9,34 +9,27 @@ PROG   :
 #include <string.h>
 #include <algorithm>
 
-#include "src/blocklist.h"
+#include "src/memorypool.h"
 
 using namespace std;
 
 int main()
 {
-    BlockList list(KB);
+    MemoryPool mp;
 
-    auto a = list.malloc();
-    auto b = list.malloc();
-    list.travel();
+    mp.travel();
 
-    a->free();
-    list.travel();
-    a = list.malloc();
-    list.travel();
-
-    auto c = list.malloc();
-    list.travel();
+    auto a = mp.malloc(513);
+    auto b = mp.malloc(2048);
+    auto c = mp.malloc(10240);
+    mp.travel();
 
     a->free();
-    list.travel();
+    b->free();
+    mp.travel();
 
-    a = list.malloc();
-    list.travel();
-
-    auto d = list.malloc();
-    list.travel();
+    b = mp.malloc(2047);
+    mp.travel();
 
     return 0;
 }
