@@ -13,6 +13,11 @@ class MemBlock : public BaseBlock
 public:
     MemBlock(BlockList* blocklist, int size)
         : BaseBlock(blocklist, size) {}
+
+    ~MemBlock()
+    {
+        if (size_ > 0) ::free(blockaddr_);
+    }
 };
 
 class MemBlockFactory: public BaseBlockFactory
@@ -63,6 +68,8 @@ BaseBlock* BlockList::new_block()
 
 BaseBlock* BlockList::malloc()
 {
+    std::lock_guard<std::mutex> lock(list_lock_);
+
     BaseBlock* target = listhead_->next_;
     while (target && target->status_ == INUSE) target = target->next_;
 
@@ -75,6 +82,24 @@ BaseBlock* BlockList::malloc()
     if (target->next_) target->next_->prev_ = target->prev_;
 
     return target;
+}
+
+void BlockList::free(BaseBlock* target)
+{
+    std::lock_guard<std::mutex> lock(list_lock_);
+
+    if (target->status_ == READY)
+    {
+        std::cout << "Error: Only Block in use can be freed\n";
+        return;
+    } else
+    {
+        target->status_ = READY;
+        --inuse;
+
+        target->prev_->next_ = target;
+        if (target->next_) target->next_->prev_ = target;
+    }
 }
 
 void BlockList::travel()

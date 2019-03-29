@@ -7,9 +7,10 @@ PROG   : MEMORYPOOL_H
 #ifndef MEMORYPOOL_H
 #define MEMORYPOOL_H
 
-#include <vector>
-
 #include "blocklist.h"
+
+#include <vector>
+#include <mutex>
 
 #define MIN_BLOCK_SIZE 256
 #define INIT_LISTS 4
@@ -28,9 +29,10 @@ public:
     // For Debug
     void travel();
 
-private:
+protected:
     std::vector<BlockList*> bllist_;
     BaseBlockFactory* factory_;
+    std::mutex list_lock_;
 };
 
 #endif // !MEMORYPOOL_H

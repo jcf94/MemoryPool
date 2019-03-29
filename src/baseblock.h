@@ -19,7 +19,7 @@ class BaseBlock
 {
 public:
     BaseBlock(BlockList* blocklist = 0, int size = 0);
-    ~BaseBlock();
+    virtual ~BaseBlock() {}
 
     inline void* blockaddr() const {return blockaddr_;}
     inline void* dataaddr() const {return dataaddr_;}

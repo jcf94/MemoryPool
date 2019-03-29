@@ -37,6 +37,7 @@ BaseBlock* MemoryPool::blockalloc(int size)
         ++count;
         if (count == bllist_.size())
         {
+            std::lock_guard<std::mutex> lock(list_lock_);
             bllist_.push_back(new BlockList(bllist_[count-1]->blocksize()*2, factory_));
         }
         size /= 2;
