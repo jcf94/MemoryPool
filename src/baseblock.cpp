@@ -11,7 +11,7 @@ PROG   : BASEBLOCK_CPP
 
 BaseBlock::BaseBlock(BlockList* blocklist, int size)
     : blocklist_(blocklist), size_(size),
-    prev_(NULL), next_(NULL), status_(IDLE)
+    prev_(NULL), next_(NULL), status_(READY)
 {
     if (size > 0) blockaddr_ = malloc(size+sizeof(void*));
     dataaddr_ = blockaddr_ + sizeof(void*);
@@ -24,13 +24,13 @@ BaseBlock::~BaseBlock()
 
 void BaseBlock::free()
 {
-    if (status_ == IDLE)
+    if (status_ == READY)
     {
         std::cout << "Error: Only Block in use can be freed\n";
         return;
     } else
     {
-        status_ = IDLE;
+        status_ = READY;
         --blocklist_->inuse;
 
         prev_->next_ = this;

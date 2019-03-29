@@ -23,6 +23,7 @@ public:
     BaseBlock* blockalloc(int size);
     void* malloc(int size);
     void free(void* dataaddr);
+    BaseBlock* getblock(void* dataaddr);
 
     // For Debug
     void travel();

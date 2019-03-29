@@ -52,11 +52,17 @@ void* MemoryPool::malloc(int size)
     return target->dataaddr();
 }
 
-void MemoryPool::free(void* dataaddr)
+BaseBlock* MemoryPool::getblock(void* dataaddr)
 {
     BaseBlock* target;
     memcpy(&target, dataaddr-sizeof(void*), sizeof(void*));
 
+    return target;
+}
+
+void MemoryPool::free(void* dataaddr)
+{
+    BaseBlock* target = getblock(dataaddr);
     target->free();
 }
 

@@ -10,7 +10,7 @@ PROG   : BASEBLOCK_H
 enum BlockStatus
 {
     INUSE,
-    IDLE
+    READY
 };
 
 class BlockList;
