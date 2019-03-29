@@ -27,7 +27,7 @@ MemoryPool::~MemoryPool()
     }
 }
 
-MemBlock* MemoryPool::blockalloc(int size)
+BaseBlock* MemoryPool::blockalloc(int size)
 {
     size = (size - 1) / MIN_BLOCK_SIZE;
     int count = 0;
@@ -45,7 +45,7 @@ MemBlock* MemoryPool::blockalloc(int size)
 
 void* MemoryPool::malloc(int size)
 {
-    MemBlock* target = blockalloc(size);
+    BaseBlock* target = blockalloc(size);
     memcpy(target->blockaddr(), &target, sizeof(void*));
 
     return target->dataaddr();
@@ -53,7 +53,7 @@ void* MemoryPool::malloc(int size)
 
 void MemoryPool::free(void* dataaddr)
 {
-    MemBlock* target;
+    BaseBlock* target;
     memcpy(&target, dataaddr-sizeof(void*), sizeof(void*));
 
     target->free();

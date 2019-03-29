@@ -4,49 +4,35 @@ LANG   : G++
 PROG   : BLOCKLIST_CPP
 ************************************************ */
 
-#include <stdlib.h>
 #include <iostream>
 
 #include "blocklist.h"
 
-MemBlock::MemBlock(BlockList* blocklist, int size)
-    : blocklist_(blocklist), size_(size),
-    prev_(NULL), next_(NULL), status_(IDLE)
+class MemBlock : public BaseBlock
 {
-    if (size > 0) blockaddr_ = malloc(size+sizeof(void*));
-    dataaddr_ = blockaddr_ + sizeof(void*);
-}
+public:
+    MemBlock(BlockList* blocklist, int size)
+        : BaseBlock(blocklist, size) {}
+};
 
-MemBlock::~MemBlock()
+class MemBlockFactory: public BaseBlockFactory
 {
-    if (size_ > 0) ::free(blockaddr_);
-}
-
-void MemBlock::free()
-{
-    if (status_ == IDLE)
+public:
+    BaseBlock* create(BlockList* blocklist, int size)
     {
-        std::cout << "Error: Only Block in use can be freed\n";
-        return;
-    } else
-    {
-        status_ = IDLE;
-        --blocklist_->inuse;
-
-        prev_->next_ = this;
-        if (next_) next_->prev_ = this;
+        return new MemBlock(blocklist, size);
     }
-}
+};
 
-BlockList::BlockList(int blocksize)
-    : blocksize_(blocksize), inuse(0)
+BlockList::BlockList(int blocksize, BaseBlockFactory* factory)
+    : blocksize_(blocksize), factory_(factory), inuse(0)
 {
     if (blocksize_ <= 0)
     {
         std::cout << "Error: size must be a positive integer in BlockList\n";
         return ;
     }
-    listhead_ = new MemBlock(this);
+    listhead_ = new BaseBlock();
     listtail_ = listhead_;
 }
 
@@ -59,9 +45,11 @@ BlockList::~BlockList()
     delete listhead_;
 }
 
-MemBlock* BlockList::new_block()
+BaseBlock* BlockList::new_block()
 {
-    MemBlock* temp = new MemBlock(this, blocksize_);
+    if (!factory_) factory_ = new MemBlockFactory();
+
+    BaseBlock* temp = factory_->create(this, blocksize_);
     blockbackup_.push_back(temp);
 
     listhead_->next_ = temp;
@@ -73,9 +61,9 @@ MemBlock* BlockList::new_block()
     return temp;
 }
 
-MemBlock* BlockList::malloc()
+BaseBlock* BlockList::malloc()
 {
-    MemBlock* target = listhead_->next_;
+    BaseBlock* target = listhead_->next_;
     while (target && target->status_ == INUSE) target = target->next_;
 
     if (!target) target = new_block();

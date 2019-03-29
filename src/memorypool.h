@@ -20,7 +20,7 @@ public:
     MemoryPool();
     ~MemoryPool();
 
-    MemBlock* blockalloc(int size);
+    BaseBlock* blockalloc(int size);
     void* malloc(int size);
     void free(void* dataaddr);
 
