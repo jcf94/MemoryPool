@@ -17,7 +17,7 @@ PROG   : BLOCKLIST_H
 class BlockList
 {
 public:
-    BlockList(int blocksize, BaseBlockFactory* factory = 0);
+    BlockList(int blocksize, BaseBlockFactory* factory);
     ~BlockList();
 
     inline int blocksize() const {return blocksize_;}

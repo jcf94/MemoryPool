@@ -17,7 +17,7 @@ PROG   : MEMORYPOOL_H
 class MemoryPool // BlockList based
 {
 public:
-    MemoryPool();
+    MemoryPool(BaseBlockFactory* factory = 0);
     ~MemoryPool();
 
     BaseBlock* blockalloc(int size);
@@ -29,7 +29,7 @@ public:
 
 private:
     std::vector<BlockList*> bllist_;
-
+    BaseBlockFactory* factory_;
 };
 
 #endif // !MEMORYPOOL_H

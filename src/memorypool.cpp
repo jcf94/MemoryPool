@@ -9,12 +9,13 @@ PROG   : MEMORYPOOL_CPP
 
 #include "memorypool.h"
 
-MemoryPool::MemoryPool()
+MemoryPool::MemoryPool(BaseBlockFactory* factory)
+    : factory_(factory)
 {
     int blocksize = MIN_BLOCK_SIZE;
     for (int i=0;i<INIT_LISTS;++i)
     {
-        bllist_.push_back(new BlockList(blocksize));
+        bllist_.push_back(new BlockList(blocksize, factory));
         blocksize <<= 1;
     }
 }
@@ -36,7 +37,7 @@ BaseBlock* MemoryPool::blockalloc(int size)
         ++count;
         if (count == bllist_.size())
         {
-            bllist_.push_back(new BlockList(bllist_[count-1]->blocksize()*2));
+            bllist_.push_back(new BlockList(bllist_[count-1]->blocksize()*2, factory_));
         }
         size /= 2;
     }
