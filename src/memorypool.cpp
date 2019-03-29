@@ -4,6 +4,7 @@ LANG   : G++
 PROG   : MEMORYPOOL_CPP
 ************************************************ */
 
+#include <string.h>
 #include <iostream>
 
 #include "memorypool.h"
@@ -26,7 +27,7 @@ MemoryPool::~MemoryPool()
     }
 }
 
-MemBlock* MemoryPool::malloc(int size)
+MemBlock* MemoryPool::blockalloc(int size)
 {
     size = (size - 1) / MIN_BLOCK_SIZE;
     int count = 0;
@@ -40,6 +41,22 @@ MemBlock* MemoryPool::malloc(int size)
         size /= 2;
     }
     return bllist_[count]->malloc();
+}
+
+void* MemoryPool::malloc(int size)
+{
+    MemBlock* target = blockalloc(size);
+    memcpy(target->blockaddr(), &target, sizeof(void*));
+
+    return target->dataaddr();
+}
+
+void MemoryPool::free(void* dataaddr)
+{
+    MemBlock* target;
+    memcpy(&target, dataaddr-sizeof(void*), sizeof(void*));
+
+    target->free();
 }
 
 void MemoryPool::travel()

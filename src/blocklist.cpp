@@ -13,12 +13,13 @@ MemBlock::MemBlock(BlockList* blocklist, int size)
     : blocklist_(blocklist), size_(size),
     prev_(NULL), next_(NULL), status_(IDLE)
 {
-    if (size > 0) block_ = malloc(size);
+    if (size > 0) blockaddr_ = malloc(size+sizeof(void*));
+    dataaddr_ = blockaddr_ + sizeof(void*);
 }
 
 MemBlock::~MemBlock()
 {
-    if (size_ > 0) ::free(block_);
+    if (size_ > 0) ::free(blockaddr_);
 }
 
 void MemBlock::free()
@@ -93,7 +94,7 @@ void BlockList::travel()
     std::cout << "============\n";
     for (auto i:blockbackup_)
     {
-        std::cout << i->block() << " " << (i->status()==INUSE?"INUSE":"IDLE") << (listhead_->next_==i?" <-":"") << "\n";
+        std::cout << i->blockaddr() << " " << (i->status()==INUSE?"INUSE":"IDLE") << (listhead_->next_==i?" <-":"") << "\n";
     }
     std::cout << "============\n";
 }

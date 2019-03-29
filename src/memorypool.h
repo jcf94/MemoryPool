@@ -20,7 +20,9 @@ public:
     MemoryPool();
     ~MemoryPool();
 
-    MemBlock* malloc(int size);
+    MemBlock* blockalloc(int size);
+    void* malloc(int size);
+    void free(void* dataaddr);
 
     // For Debug
     void travel();

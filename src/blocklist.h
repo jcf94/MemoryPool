@@ -28,7 +28,8 @@ public:
     MemBlock(BlockList* blocklist = NULL, int size = 0);
     ~MemBlock();
 
-    inline void* block() const {return block_;}
+    inline void* blockaddr() const {return blockaddr_;}
+    inline void* dataaddr() const {return dataaddr_;}
     inline int size() const {return size_;}
     inline BlockStatus status() const {return status_;}
 
@@ -38,7 +39,8 @@ private:
     MemBlock* prev_;
     MemBlock* next_;
 
-    void* block_;
+    void* blockaddr_;
+    void* dataaddr_;
     int size_;
     BlockStatus status_;
 
