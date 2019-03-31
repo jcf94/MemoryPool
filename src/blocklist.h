@@ -12,8 +12,9 @@ PROG   : BLOCKLIST_H
 #include <vector>
 #include <mutex>
 
-#define KB 1024
-#define MB 1024*KB
+#define KB (1024)
+#define MB (1024 * KB)
+#define GM (1024 * MB)
 
 class BlockList
 {
